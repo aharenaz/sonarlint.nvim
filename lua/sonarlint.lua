@@ -57,7 +57,7 @@ local function start_sonarlint_lsp(user_config)
    config.handlers["sonarlint/getJavaConfig"] = function(err, uri)
       local is_test_file = false
       if M.classpaths_result then
-         local err, is_test_file_result = require("jdtls.util").execute_command({
+         local err, is_test_file_result = require("util").execute_command({
             command = "java.project.isTestFile",
             arguments = { uri },
          })
@@ -175,7 +175,7 @@ function M._handle_progress(err, msg, info)
       return
    end
 
-   require("jdtls.util").with_classpaths(function(result)
+   require("util").with_classpaths(function(result)
       M.classpaths_result = result
 
       local sonarlint = vim.lsp.get_client_by_id(M.client_id)
@@ -214,15 +214,6 @@ function M.setup(config)
    })
 
    if java then
-      local ok, jdtls_util = pcall(require, "jdtls.util")
-      if not ok then
-         vim.notify(
-            "nvim-jdtls isn't available and is required for analyzing Java files. Make sure to install it",
-            vim.log.levels.ERROR
-         )
-         return
-      end
-
       if vim.lsp.handlers["$/progress"] then
          local old_handler = vim.lsp.handlers["$/progress"]
          vim.lsp.handlers["$/progress"] = function(...)
